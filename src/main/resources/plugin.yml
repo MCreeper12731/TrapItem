@@ -1,0 +1,7 @@
+name: TrapItem
+version: '${project.version}'
+main: com.github.mcreeper12731.trapitem.TrapItem
+api-version: '1.20'
+commands:
+  gettrapitem:
+    usage: <command> lmao
