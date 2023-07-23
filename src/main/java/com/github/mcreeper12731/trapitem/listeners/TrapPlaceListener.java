@@ -2,6 +2,7 @@ package com.github.mcreeper12731.trapitem.listeners;
 
 import com.github.mcreeper12731.trapitem.util.Constants;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.ArmorStand;
@@ -30,8 +31,9 @@ public class TrapPlaceListener implements Listener {
 
         if (!isTrapItem(item)) return;
         event.setCancelled(true);
-        item.setAmount(item.getAmount() - 1);
+        if (player.getGameMode() != GameMode.CREATIVE) item.setAmount(item.getAmount() - 1);
 
+        //Summon an invisible armor stand to mark trap's location
         ArmorStand armorStand = (ArmorStand) player.getWorld().spawnEntity(
                 event.getBlockPlaced().getLocation().clone().add(0.5, -2, 0.5),
                 EntityType.ARMOR_STAND

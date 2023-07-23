@@ -12,6 +12,7 @@ public class GetItemCommand implements CommandExecutor {
 
     private final NamespacedKey key;
 
+    //Command to get the item
     public GetItemCommand(NamespacedKey key) {
         this.key = key;
     }

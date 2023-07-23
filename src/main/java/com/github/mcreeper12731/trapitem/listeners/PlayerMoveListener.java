@@ -31,11 +31,13 @@ public class PlayerMoveListener implements Listener {
 
         Player player = event.getPlayer();
 
+        //Check if player is in trap activation range
         for (Entity entity : player.getNearbyEntities(0.5, 5, 0.5)) {
             if (!(entity instanceof ArmorStand armorStand)) continue;
             if (!isArmorStandValid(armorStand)) continue;
-
             armorStand.remove();
+
+            //Send block updates to client in order to not mess with actual terrain
             List<Material> replaceWith = new ArrayList<>();
             for (int x = -1; x < 2; x++) {
                 for (int z = -1; z < 2; z++) {
@@ -44,21 +46,29 @@ public class PlayerMoveListener implements Listener {
                     replaceWith.add(tempLocation.getBlock().getType());
                 }
             }
+
+            //Send block updates again after 3 seconds to restore client side view
             new RestoreTerrain(player, armorStand.getLocation().add(0, 1, 0), replaceWith).start();
+
+            //Player effects
             player.sendMessage(ChatColor.YELLOW + "You stepped on a trap!");
             player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1));
             player.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 1);
 
         }
 
+        //Check if player is in particle display range
         for (Entity entity : player.getNearbyEntities(10, 14, 10)) {
             if (!(entity instanceof ArmorStand armorStand)) continue;
             if (!isArmorStandValid(armorStand)) continue;
             if (particleCooldown.cantSummonParticles.contains(armorStand.getUniqueId())) continue;
 
+            //Spawn a simple redstone particle
             player.spawnParticle(Particle.REDSTONE, armorStand.getLocation().add(0, 2.5, 0), 5,
                     new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0F)
             );
+
+            //Add armor stand to a set to prevent any more particles at that location
             particleCooldown.cantSummonParticles.add(armorStand.getUniqueId());
         }
 
@@ -80,6 +90,7 @@ public class PlayerMoveListener implements Listener {
         @Override
         public void run() {
             if (cooldownRemaining <= 0) {
+                //After 5 seconds clear the set to allow new particles at existing locations
                 cantSummonParticles.clear();
                 cooldownRemaining = 5;
             }
